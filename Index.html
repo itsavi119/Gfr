@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GFR Calculator - CKD-EPI Formula</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .calculator-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .result-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .result-stage {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .info-section {
+            background: #e8f4f8;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .info-section p, .info-section li {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .stages-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stages-table th, .stages-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stages-table th {
+            background: #2c3e50;
+            color: white;
+            font-weight: 600;
+        }
+
+        .stages-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .formula-section {
+            background: #fff3cd;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #ffc107;
+            margin-bottom: 30px;
+        }
+
+        .formula-section h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .formula {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            border: 1px solid #ffeaa7;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .result-value {
+                font-size: 2.5em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+
+        .warning {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #dc3545;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GFR Calculator</h1>
+            <p>Estimated Glomerular Filtration Rate using CKD-EPI 2021 Formula</p>
+        </div>
+
+        <div class="content">
+            <div class="calculator-section">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">Patient Information</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age">Age (years)</label>
+                        <input type="number" id="age" min="18" max="120" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender">
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="creatinine">Serum Creatinine</label>
+                        <input type="number" id="creatinine" step="0.01" placeholder="Enter creatinine level">
+                    </div>
+                    <div class="form-group">
+                        <label for="creatinine-unit">Creatinine Unit</label>
+                        <select id="creatinine-unit">
+                            <option value="mg/dl">mg/dL</option>
+                            <option value="umol/l">μmol/L</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="race">Race/Ethnicity</label>
+                    <select id="race">
+                        <option value="other">Non-Black</option>
+                        <option value="black">Black/African American</option>
+                    </select>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateGFR()">Calculate eGFR</button>
+            </div>
+
+            <div class="result-section" id="results">
+                <h3>Estimated GFR Result</h3>
+                <div class="result-value" id="gfr-value">--</div>
+                <div>mL/min/1.73 m²</div>
+                <div class="result-stage" id="ckd-stage">--</div>
+                <div class="result-description" id="stage-description">--</div>
+            </div>
+
+            <div class="warning">
+                <strong>Important:</strong> This calculator is for educational purposes only. eGFR results should always be interpreted by qualified healthcare professionals in the context of clinical presentation and other laboratory findings. Do not use for medical decision-making without professional consultation.
+            </div>
+
+            <div class="info-section">
+                <h3>About the CKD-EPI 2021 Formula</h3>
+                <p>The Chronic Kidney Disease Epidemiology Collaboration (CKD-EPI) 2021 equation is the current gold standard recommended by WHO and major nephrology organizations worldwide for estimating glomerular filtration rate (GFR).</p>
+                
+                <p><strong>Key Features:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>More accurate than older formulas, especially at higher GFR levels</li>
+                    <li>Reduced bias compared to the Modification of Diet in Renal Disease (MDRD) equation</li>
+                    <li>Updated in 2021 to remove race coefficient while maintaining clinical utility</li>
+                    <li>Validated across diverse populations and age groups</li>
+                </ul>
+            </div>
+
+            <div class="formula-section">
+                <h3>CKD-EPI 2021 Formula</h3>
+                <p>The formula uses different coefficients based on gender and creatinine levels:</p>
+                
+                <div class="formula">
+                    eGFR = 142 × min(Scr/κ, 1)^α × max(Scr/κ, 1)^(-1.200) × 0.9938^Age × (1.012 if female)
+                </div>
+                
+                <p style="margin-top: 15px;"><strong>Where:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Scr</strong> = serum creatinine in mg/dL</li>
+                    <li><strong>κ</strong> = 0.7 (females) or 0.9 (males)</li>
+                    <li><strong>α</strong> = -0.241 (females) or -0.302 (males)</li>
+                    <li><strong>min</strong> = minimum of Scr/κ or 1</li>
+                    <li><strong>max</strong> = maximum of Scr/κ or 1</li>
+                </ul>
+            </div>
+
+            <div class="info-section">
+                <h3>CKD Stages and Clinical Significance</h3>
+                <table class="stages-table">
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>eGFR (mL/min/1.73 m²)</th>
+                            <th>Description</th>
+                            <th>Clinical Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>G1</strong></td>
+                            <td>≥ 90</td>
+                            <td>Normal or high kidney function</td>
+                            <td>Monitor if kidney damage present</td>
+                        </tr>
+                        <tr>
+                            <td><strong>G2</strong></td>
+                            <td>60-89</td>
+                            <td>Mild decrease in kidney function</td>
+                            <td>Monitor and treat comorbidities</td>
+                        </tr>
+                        <tr>
+                            <td><strong>G3a</strong></td>
+                            <td>45-59</td>
+                            <td>Mild to moderate decrease</td>
+                            <td>Evaluate and treat complications</td>
+                        </tr>
+                        <tr>
+                            <td><strong>G3b</strong></td>
+                            <td>30-44</td>
+                            <td>Moderate to severe decrease</td>
+                            <td>Prepare for renal replacement therapy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>G4</strong></td>
+                            <td>15-29</td>
+                            <td>Severe decrease in kidney function</td>
+                            <td>Prepare for renal replacement therapy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>G5</strong></td>
+                            <td>&lt; 15</td>
+                            <td>Kidney failure</td>
+                            <td>Renal replacement therapy required</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-section">
+                <h3>Clinical Indications for GFR Calculation</h3>
+                <ul style="margin-left: 20px;">
+                    <li><strong>Chronic Kidney Disease (CKD) screening:</strong> In patients with diabetes, hypertension, cardiovascular disease, or family history of kidney disease</li>
+                    <li><strong>Drug dosing:</strong> Many medications require dose adjustment based on kidney function</li>
+                    <li><strong>Pre-operative assessment:</strong> Before procedures involving contrast agents or nephrotoxic drugs</li>
+                    <li><strong>Monitoring disease progression:</strong> Regular follow-up in patients with known CKD</li>
+                    <li><strong>Referral decisions:</strong> Determining when to refer to nephrology specialists</li>
+                    <li><strong>Treatment planning:</strong> Preparing patients for renal replacement therapy</li>
+                </ul>
+            </div>
+
+            <div class="info-section">
+                <h3>Limitations and Considerations</h3>
+                <ul style="margin-left: 20px;">
+                    <li>Less accurate in patients with unusual muscle mass (very muscular or cachectic)</li>
+                    <li>May overestimate GFR in elderly patients</li>
+                    <li>Not validated in pregnancy, children, or certain ethnic groups</li>
+                    <li>Creatinine levels can be affected by diet, medications, and acute illness</li>
+                    <li>Should be confirmed with additional tests (cystatin C, measured GFR) when clinically indicated</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateGFR() {
+            // Get input values
+            const age = parseFloat(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const creatinine = parseFloat(document.getElementById('creatinine').value);
+            const creatinineUnit = document.getElementById('creatinine-unit').value;
+            const race = document.getElementById('race').value;
+
+            // Validate inputs
+            if (!age || !gender || !creatinine) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (age < 18 || age > 120) {
+                alert('Age must be between 18 and 120 years');
+                return;
+            }
+
+            // Convert creatinine to mg/dL if needed
+            let scrMgdl = creatinine;
+            if (creatinineUnit === 'umol/l') {
+                scrMgdl = creatinine / 88.42; // Convert μmol/L to mg/dL
+            }
+
+            // CKD-EPI 2021 formula parameters
+            let kappa, alpha;
+            if (gender === 'female') {
+                kappa = 0.7;
+                alpha = -0.241;
+            } else {
+                kappa = 0.9;
+                alpha = -0.302;
+            }
+
+            // Calculate eGFR using CKD-EPI 2021 formula
+            const scrKappaRatio = scrMgdl / kappa;
+            const minTerm = Math.min(scrKappaRatio, 1);
+            const maxTerm = Math.max(scrKappaRatio, 1);
+            
+            let egfr = 142 * Math.pow(minTerm, alpha) * Math.pow(maxTerm, -1.200) * Math.pow(0.9938, age);
+            
+            if (gender === 'female') {
+                egfr *= 1.012;
+            }
+
+            // Round to 1 decimal place
+            egfr = Math.round(egfr * 10) / 10;
+
+            // Determine CKD stage and description
+            let stage, description, stageColor;
+            if (egfr >= 90) {
+                stage = 'G1 - Normal/High';
+                description = 'Normal or high kidney function. Monitor if kidney damage is present.';
+                stageColor = '#27ae60';
+            } else if (egfr >= 60) {
+                stage = 'G2 - Mild decrease';
+                description = 'Mild decrease in kidney function. Monitor and treat comorbidities.';
+                stageColor = '#f39c12';
+            } else if (egfr >= 45) {
+                stage = 'G3a - Mild to moderate decrease';
+                description = 'Mild to moderate decrease in kidney function. Evaluate and treat complications.';
+                stageColor = '#e67e22';
+            } else if (egfr >= 30) {
+                stage = 'G3b - Moderate to severe decrease';
+                description = 'Moderate to severe decrease in kidney function. Prepare for renal replacement therapy.';
+                stageColor = '#d35400';
+            } else if (egfr >= 15) {
+                stage = 'G4 - Severe decrease';
+                description = 'Severe decrease in kidney function. Prepare for renal replacement therapy.';
+                stageColor = '#c0392b';
+            } else {
+                stage = 'G5 - Kidney failure';
+                description = 'Kidney failure. Renal replacement therapy required.';
+                stageColor = '#8e44ad';
+            }
+
+            // Display results
+            document.getElementById('gfr-value').textContent = egfr;
+            document.getElementById('ckd-stage').textContent = stage;
+            document.getElementById('ckd-stage').style.color = stageColor;
+            document.getElementById('stage-description').textContent = description;
+            document.getElementById('results').style.display = 'block';
+
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Allow Enter key to calculate
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateGFR();
+            }
+        });
+    </script>
+</body>
+</html>
